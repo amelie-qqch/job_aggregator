@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class FranceTravailAuthenticationApiTest extends TestCase
 {
@@ -78,7 +79,7 @@ class FranceTravailAuthenticationApiTest extends TestCase
         $response = new MockResponse(
             "",
             [
-                'http_code' => 401,
+                'http_code' => Response::HTTP_UNAUTHORIZED,
             ]
         );
         $url        = 'https://francetravail.io/connexion/oauth2/access_token?realm=partenaire';
