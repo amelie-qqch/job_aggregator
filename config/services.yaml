@@ -1,0 +1,52 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    _instanceof:
+        App\Infrastructure\Api\AuthenticationApiInterface:
+            tags: [ 'api.authentication' ]
+
+#    App\:
+#        resource: '../src/'
+
+    # Commands
+    App\Command\:
+        resource: '../src/Command/'
+
+    # Application
+    App\Application\Service\TokenProvider:
+        arguments:
+            $authenticationApis: !tagged_iterator { tag: 'api.authentication', default_index_method: 'getIndex'}
+
+    App\Application\Service\TokenProviderInterface: '@App\Application\Service\TokenProvider'
+
+    # Domain Services
+    App\Domain\JobSearching\JobSearchingHandler:
+        arguments:
+            $jobApi: '@App\Infrastructure\Api\FranceTravailJobSearchingApi'
+
+    # Infrastructure Services
+    App\Infrastructure\Api\FranceTravailJobSearchingApi:
+        arguments:
+            $tokenProvider: '@App\Application\Service\TokenProvider'
+            $clientId:       '%env(FRANCE_TRAVAIL_CLIENT_ID)%'
+
+    App\Infrastructure\Api\FranceTravailAuthenticationApi:
+        arguments:
+            $clientId:     '%env(FRANCE_TRAVAIL_CLIENT_ID)%'
+            $clientSecret: '%env(FRANCE_TRAVAIL_CLIENT_SECRET)%'
+
+
+    # Repositories
+    App\Infrastructure\Repository\:
+        resource: "../src/Infrastructure/Repository/"
+    App\Domain\Repository\JobRepositoryInterface: '@App\Infrastructure\Repository\JobRepository'
