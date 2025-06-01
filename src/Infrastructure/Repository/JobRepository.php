@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repository;
 use App\Domain\Model\Job;
 use App\Domain\Repository\JobRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 class JobRepository extends ServiceEntityRepository implements JobRepositoryInterface
@@ -25,6 +26,7 @@ class JobRepository extends ServiceEntityRepository implements JobRepositoryInte
     /**
      * @param Job[] $jobs
      * @return void
+     * @throws Exception
      */
     public function batchCreate(array $jobs): void {
         $connection = $this->getEntityManager()->getConnection();
