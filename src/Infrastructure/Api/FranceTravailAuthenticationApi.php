@@ -3,13 +3,8 @@
 namespace App\Infrastructure\Api;
 
 use App\Infrastructure\Exception\ApiException;
-use HttpRequest;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class FranceTravailAuthenticationApi implements AuthenticationApiInterface
@@ -37,10 +32,10 @@ class FranceTravailAuthenticationApi implements AuthenticationApiInterface
     public function authenticate(): AuthenticationResponse
     {
         $body = [
-            "grant_type" => self::GRANT_TYPE,
-            "client_id" => $this->clientId,
+            "grant_type"    => self::GRANT_TYPE,
+            "client_id"     => $this->clientId,
             "client_secret" => $this->clientSecret,
-            "scope" => self::SCOPE,
+            "scope"         => self::SCOPE,
         ];
         $headers = [
             "Content-type: application/x-www-form-urlencoded",
