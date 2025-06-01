@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+// TODO Ajouter un paramètre report
 #[AsCommand('app:fetch-jobs')]
 class FetchJobsCommand extends Command
 {
@@ -39,27 +40,16 @@ class FetchJobsCommand extends Command
                 'Locations of the jobs, use the city code (INSEE code)',
                 self::DEFAULT_CITY_CODES
             )
-            ->addOption(
-                'report',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                '[Not implemented yet] Whether to display a report of the jobs retrieved,
-                if the option is passed without value the report will be displayed in the console,
-                otherwise please specify a path for the report file.',
-            )
             ->addUsage(
-                "app:fetch-jobs --location=35238 --location=75113 --location=33063 --report=./report.csv",
+                "app:fetch-jobs --location=35238 --location=75113 --location=33063",
             )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // Récupérer les city code
-        // TODO Ajouter un paramètre report
-        $query = new JobSearchingQuery(
-            self::DEFAULT_CITY_CODES,
-        );
+        $locations = $input->getOption('location');
+        $query     = new JobSearchingQuery($locations);
 
         try {
             $this->handler->handle($query);
@@ -70,9 +60,11 @@ class FetchJobsCommand extends Command
         } catch (\Throwable $exception) {
             $msg = sprintf("Error when fetching jobs: %s", $exception->getMessage());
             $output->writeln($msg);
+
+            return Command::FAILURE;
         }
 
-        return COMMAND::FAILURE;
+        return COMMAND::SUCCESS;
     }
 
 
