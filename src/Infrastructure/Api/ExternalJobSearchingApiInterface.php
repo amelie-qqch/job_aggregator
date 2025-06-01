@@ -12,5 +12,5 @@ interface ExternalJobSearchingApiInterface
      *
      * @return Job[]
      */
-    public function fetchJobs(array $params): array;
+    public function fetchJobs(JobSearchingParamsInterface $params): array;
 }

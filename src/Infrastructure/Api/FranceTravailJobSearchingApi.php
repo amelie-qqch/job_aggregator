@@ -28,11 +28,11 @@ class FranceTravailJobSearchingApi implements ExternalJobSearchingApiInterface
     }
 
     /**
-     * @param array $params
+     * @param FranceTravailJobSearchingParams $params
      * @return Job[]
      * @throws ApiException
      */
-    public function fetchJobs(array $params): array
+    public function fetchJobs(JobSearchingParamsInterface $params): array
     {
         try {
             $token = $this->tokenProvider->getToken(self::PROVIDER_NAME, $this->clientId);
@@ -43,9 +43,9 @@ class FranceTravailJobSearchingApi implements ExternalJobSearchingApiInterface
         $headers = [
             'Authorization' => 'Bearer ' . $token,
         ];
-        $range       = sprintf("%d-%d", $params['from'], $params['from'] + self::MAX_RESULT);
+        $range       = sprintf("%d-%d", $params->rangeStart, $params->rangeStart + self::MAX_RESULT);
         $queryParams = [
-            'commune' => implode(",", $params['location']),
+            'commune' => implode(",", $params->commune),
             'range'   => $range,
         ];
 
@@ -65,21 +65,25 @@ class FranceTravailJobSearchingApi implements ExternalJobSearchingApiInterface
             throw new ApiException($msg);
         }
 
-        $content      = $response->getContent();
         $responseCode = $response->getStatusCode();
+
+        if(Response::HTTP_NO_CONTENT === $responseCode) {
+            return [];
+        }
+
         if(
             Response::HTTP_PARTIAL_CONTENT !== $responseCode &&
             Response::HTTP_OK !== $responseCode
         ) {
             $msg = sprintf(
-                "Could not retrieve jobs from France Travail API: code %d, message %s",
-                $responseCode,
-                $content
+                "Could not retrieve jobs from France Travail API: code %d",
+                $responseCode
             );
 
             throw new ApiException($msg);
         }
 
+        $content         = $response->getContent();
         $decodedResponse = json_decode($content, true);
         if(null === $decodedResponse) {
             throw new ApiException("Could not read jobs from France Travail API's response.");
@@ -99,7 +103,10 @@ class FranceTravailJobSearchingApi implements ExternalJobSearchingApiInterface
         return $jobs;
     }
 
-    //TODO vérifier que la clé est présente dans le json
+    /**
+     * TODO check if json key is not missing
+     * TODO add textSanitizer
+     */
     private function parseToJob(array $jsonJob): Job {
         $title = $jsonJob['intitule'];
 

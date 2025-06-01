@@ -58,17 +58,16 @@ class FranceTravailAuthenticationApi implements AuthenticationApiInterface
         }
 
         $responseCode = $response->getStatusCode();
-        $content      = $response->getContent();
         if(Response::HTTP_OK !== $responseCode) {
             $msg = sprintf(
-                "Authentication to France Travail API failed: code %d, message %s",
+                "Authentication to France Travail API failed: code %d",
                 $responseCode,
-                $content
             );
 
             throw new ApiException($msg);
         }
 
+        $content         = $response->getContent();
         $decodedResponse = json_decode($content, true);
         if(null === $decodedResponse || !array_key_exists('access_token', $decodedResponse)) {
             throw new ApiException("Could not read authentication token from response.");

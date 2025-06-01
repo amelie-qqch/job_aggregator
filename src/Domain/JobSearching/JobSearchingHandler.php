@@ -6,6 +6,7 @@ use App\Domain\Exception\CouldNotCreateEntityException;
 use App\Domain\Model\Job;
 use App\Domain\Repository\JobRepositoryInterface;
 use App\Infrastructure\Api\ExternalJobSearchingApiInterface;
+use App\Infrastructure\Api\FranceTravailJobSearchingParams;
 use Psr\Log\LoggerInterface;
 
 class JobSearchingHandler
@@ -23,10 +24,10 @@ class JobSearchingHandler
      * @throws CouldNotCreateEntityException
      */
     public function handle(JobSearchingQuery $query): array {
-        $params = [
-            'location' => $query->locations,
-            'from'     => $query->from,
-        ];
+        $params = new FranceTravailJobSearchingParams(
+            $query->locations,
+            $query->from
+        );
 
         $jobs = $this->jobApi->fetchJobs($params);
 
