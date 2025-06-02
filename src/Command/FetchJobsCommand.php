@@ -64,6 +64,8 @@ class FetchJobsCommand extends Command
             return Command::FAILURE;
         }
 
+        $output->writeln("Successfully fetched jobs");
+
         return COMMAND::SUCCESS;
     }
 
